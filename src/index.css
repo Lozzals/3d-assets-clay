@@ -130,7 +130,6 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-    overflow: hidden;
   }
 
   /* Dotted wallpaper background */
