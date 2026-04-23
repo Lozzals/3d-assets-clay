@@ -63,16 +63,42 @@ export const GlbPreview = ({ file, enabled }: Props) => {
       `${GLB_BASE}${file}`,
       (gltf) => {
         const obj = gltf.scene;
-        const box = new THREE.Box3().setFromObject(obj);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        obj.position.sub(center);
-        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+
+        // First measure raw bounds and normalize scale to ~1.6 units
+        const rawBox = new THREE.Box3().setFromObject(obj);
+        const rawSize = rawBox.getSize(new THREE.Vector3());
+        const maxDim = Math.max(rawSize.x, rawSize.y, rawSize.z) || 1;
         const scale = 1.6 / maxDim;
         obj.scale.setScalar(scale);
+
+        // Re-measure AFTER scaling, then center the object on origin
+        obj.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(obj);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        obj.position.sub(center);
+
         pivot = new THREE.Object3D();
         pivot.add(obj);
         scene.add(pivot);
+
+        // Fit camera to the centered, scaled bounds
+        const fitOffset = 1.35;
+        const maxFitDim = Math.max(size.x, size.y, size.z);
+        const fov = (camera.fov * Math.PI) / 180;
+        const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * fitOffset;
+        const dir = new THREE.Vector3(1, 0.7, 1.4).normalize();
+        camera.position.copy(dir.multiplyScalar(distance));
+        camera.near = distance / 100;
+        camera.far = distance * 100;
+        camera.lookAt(0, 0, 0);
+        camera.updateProjectionMatrix();
+        if (controls) {
+          controls.target.set(0, 0, 0);
+          controls.minDistance = distance * 0.3;
+          controls.maxDistance = distance * 5;
+          controls.update();
+        }
 
         if (gltf.animations && gltf.animations.length) {
           mixer = new THREE.AnimationMixer(obj);
