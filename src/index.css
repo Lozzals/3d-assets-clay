@@ -204,5 +204,4 @@
     color: hsl(var(--foreground));
     box-shadow: 1.5px 1.5px 0 hsl(var(--window-border) / 0.4);
   }
-  }
 }
