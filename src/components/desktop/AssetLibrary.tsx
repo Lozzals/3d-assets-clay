@@ -45,9 +45,9 @@ const AssetCard = ({ asset }: CardProps) => {
   return (
     <div
       ref={ref}
-      className="flex flex-col overflow-hidden rounded-md border border-window-border bg-window transition-transform hover:-translate-y-0.5"
+        className="flex flex-col overflow-hidden rounded-[4px] border border-window-border bg-window shadow-[2px_2px_0_0_hsl(var(--window-border)/0.25)] transition-transform hover:-translate-y-0.5"
     >
-      <div className="relative aspect-square w-full bg-muted">
+      <div className="relative aspect-square w-full border-b border-window-border bg-muted">
         {asset.t === "glb" && asset.f ? (
           <GlbPreview file={asset.f} enabled={visible} />
         ) : (
@@ -144,21 +144,30 @@ export const AssetLibrary = () => {
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-1.5 border-b border-window-border bg-window-chrome/40 px-3 py-2">
-        {categories.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCat(c)}
-            className={`rounded-full border px-2.5 py-0.5 text-[10px] transition-colors ${
-              cat === c
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-window-border bg-window text-muted-foreground hover:border-accent hover:text-accent"
-            }`}
-          >
-            {c === "All" ? "All" : `${CATEGORY_ICONS[c] ?? ""} ${c}`}
-          </button>
-        ))}
+      {/* Filters — pixel tabs */}
+      <div className="flex flex-wrap items-end gap-1 border-b border-window-border bg-window-chrome/40 px-3 pt-2">
+        {categories.map((c) => {
+          const active = cat === c;
+          return (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={`os-tab !pb-1 ${
+                active
+                  ? "!bg-window translate-y-px font-semibold text-foreground"
+                  : "!bg-window-chrome text-muted-foreground hover:!bg-window hover:text-foreground"
+              }`}
+              style={active ? { borderBottomColor: "hsl(var(--window))" } : undefined}
+            >
+              {c === "All" ? "All" : (
+                <>
+                  <span className="text-[11px]">{CATEGORY_ICONS[c] ?? ""}</span>
+                  <span>{c}</span>
+                </>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Grid */}
