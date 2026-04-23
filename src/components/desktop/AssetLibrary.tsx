@@ -45,9 +45,9 @@ const AssetCard = ({ asset }: CardProps) => {
   return (
     <div
       ref={ref}
-      className="flex flex-col overflow-hidden rounded-md border border-window-border bg-window transition-transform hover:-translate-y-0.5"
+        className="flex flex-col overflow-hidden rounded-[4px] border border-window-border bg-window shadow-[2px_2px_0_0_hsl(var(--window-border)/0.25)] transition-transform hover:-translate-y-0.5"
     >
-      <div className="relative aspect-square w-full bg-muted">
+      <div className="relative aspect-square w-full border-b border-window-border bg-muted">
         {asset.t === "glb" && asset.f ? (
           <GlbPreview file={asset.f} enabled={visible} />
         ) : (
