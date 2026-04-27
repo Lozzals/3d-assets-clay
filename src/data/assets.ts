@@ -16,7 +16,7 @@ export const CATEGORY_ICONS: Record<string, string> = {
   Building: "🏗", Landscape: "🌍", Rocks: "🪨", Seating: "🪑", Tables: "🪵",
   Rugs: "🎨", Lights: "💡", Statues: "🗿", Foliage: "🌿", Pots: "🏺",
   Creatures: "🦎", Soundsystems: "🎵", Technology: "💻", Transport: "🛹",
-  Instruments: "🎸", Signs: "🪧", Animations: "🎬", Misc: "📦",
+  Instruments: "🎸", Signs: "🪧", Animations: "🎬", Misc: "📦", Interiors: "🏪", 
 };
 
 export const ASSETS: Asset[] = [
@@ -234,4 +234,15 @@ export const ASSETS: Asset[] = [
   { n: "Parasol Fluffy", f: "ParasolFluffy_low.glb", t: "glb", c: "Misc" },
   { n: "Token", f: "Token_low.glb", t: "glb", c: "Misc" },
   { n: "TreeHouse", f: "TreeHouse_low.glb", t: "glb", c: "Misc" },
+// INTERIORS
+  { n: "Florist Interior", f: "Floristextrainterior.glb", t: "glb", c: "Interiors" },
+  { n: "Furniture Counter", f: "Furniture_Counter.glb", t: "glb", c: "Interiors" },
+  { n: "Skate Cornicing", f: "SkateCornicing.glb", t: "glb", c: "Interiors" },
+  { n: "Sound Store Cornice", f: "SoundStoreCornice.glb", t: "glb", c: "Interiors" },
+  { n: "Sound Store Interior", f: "SoundStoreCorniceInterior.glb", t: "glb", c: "Interiors" },
+  { n: "The Sound Store", f: "TheSoundStore_0002.glb", t: "glb", c: "Interiors" },
+  { n: "Ceiling Rose", f: "ceilingrose.glb", t: "glb", c: "Interiors" },
+  { n: "Door Frame", f: "door_frame.glb", t: "glb", c: "Interiors" },
+  { n: "Skateboard Wall", f: "skateboard_wall.glb", t: "glb", c: "Interiors" },
+  { n: "Test Planters", f: "test_planters.glb", t: "glb", c: "Interiors" },
 ];
