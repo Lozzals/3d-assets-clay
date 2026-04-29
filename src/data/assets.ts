@@ -132,7 +132,7 @@ export const ASSETS: Asset[] = [
   { n: "Mushroom House", f: "MushroomHouse.glb", t: "glb", c: "Foliage" },
   // CREATURES
   { n: "Fish 1", f: "Fish1.glb", t: "glb", c: "Creatures" },
-  { n: "Seahorse 1", f: "Seahorse_low.glb", t: "glb", c: "Creatures" },
+  { n: "Seahorse 1", f: "seahorse.glb", t: "glb", c: "Creatures" },
   { n: "Anglerfish 1", f: "Anglerfish_low.glb", t: "glb", c: "Creatures" },
   { n: "Parrot", f: "Parrot.glb", t: "glb", c: "Creatures" },
   { n: "Cave Monster (7 anims)", f: "CaveMonster_low.glb", t: "glb", c: "Creatures" },
@@ -236,6 +236,7 @@ export const ASSETS: Asset[] = [
   { n: "TreeHouse", f: "TreeHouse_low.glb", t: "glb", c: "Misc" },
 // INTERIORS
   { n: "Florist Interior", f: "Floristextrainterior.glb", t: "glb", c: "Interiors" },
+  { n: "Mama's Shack", f: "MamasShack.glb", t: "glb", c: "Interiors" },
   { n: "Furniture Counter", f: "Furniture_Counter.glb", t: "glb", c: "Interiors" },
   { n: "Skate Cornicing", f: "SkateCornicing.glb", t: "glb", c: "Interiors" },
   { n: "Sound Store Cornice", f: "SoundStoreCornice.glb", t: "glb", c: "Interiors" },
