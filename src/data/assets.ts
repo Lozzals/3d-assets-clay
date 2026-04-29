@@ -136,7 +136,6 @@ export const ASSETS: Asset[] = [
   { n: "Anglerfish 1", f: "Anglerfish_low.glb", t: "glb", c: "Creatures" },
   { n: "Parrot", f: "Parrot.glb", t: "glb", c: "Creatures" },
   { n: "Cave Monster (7 anims)", f: "CaveMonster_low.glb", t: "glb", c: "Creatures" },
-  { n: "Crocodile (bite + swim)", f: "Crocodile_low.glb", t: "glb", c: "Creatures" },
   { n: "Eel", f: "Eel_low.glb", t: "glb", c: "Creatures" },
   { n: "Turtle (swim + landing)", f: "Turtle_low.glb", t: "glb", c: "Creatures" },
   { n: "Puffer Fish", f: "PufferFish_low.glb", t: "glb", c: "Creatures" },
@@ -145,6 +144,8 @@ export const ASSETS: Asset[] = [
   { n: "Rock Creature (3 anims)", f: "RockCreature_low.glb", t: "glb", c: "Creatures" },
   { n: "Amythest Creature", f: "AmythestCreature_low.glb", t: "glb", c: "Creatures" },
   { n: "Monsters Pack", f: "Monsters_low.glb", t: "glb", c: "Creatures" },
+  { n: "Crocodile", f: "croc.glb", t: "glb", c: "Creatures" },
+  { n: "Small Creature", f: "smallcreature.glb", t: "glb", c: "Creatures" },
   // STATUES
   { n: "Fountain 1 Pose", f: "Fountain1_Pose_low.glb", t: "glb", c: "Statues" },
   { n: "Fountain 2 Eyeball", f: "Fountain2_Eyeballs_Low.glb", t: "glb", c: "Statues" },
