@@ -180,7 +180,7 @@ export const AssetLibrary = () => {
           className="ml-1 rounded border border-window-border bg-window px-2 py-1 text-[10px] font-semibold uppercase tracking-wider hover:bg-muted"
           title={showCats ? "Hide categories" : "Show categories"}
         >
-          {showCats ? "▾ Hide cats" : "▸ Show cats"}
+          {showCats ? "▾ Hide categories" : "▸ Show categories"}
         </button>
         <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} assets</div>
       </div>
