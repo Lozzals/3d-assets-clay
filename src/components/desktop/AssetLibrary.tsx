@@ -15,16 +15,15 @@ const CHARACTER_CATEGORIES = new Set([
 ]);
 const ANIMATION_CATEGORIES = new Set(["Animations", "Creatures"]);
 
-type Group = "All" | "Characters" | "World" | "Animations";
+type Group = "Characters" | "World" | "Animations";
 
-const groupOf = (cat: string): Exclude<Group, "All"> => {
+const groupOf = (cat: string): Group => {
   if (CHARACTER_CATEGORIES.has(cat)) return "Characters";
   if (ANIMATION_CATEGORIES.has(cat)) return "Animations";
   return "World";
 };
 
 const GROUP_META: { id: Group; label: string; icon: string }[] = [
-  { id: "All", label: "All", icon: "✦" },
   { id: "Characters", label: "Characters", icon: "🧑" },
   { id: "World", label: "World & Build", icon: "🏗" },
   { id: "Animations", label: "Anim & Creatures", icon: "🎬" },
