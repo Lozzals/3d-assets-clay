@@ -9,6 +9,51 @@ interface Props {
   enabled: boolean;
 }
 
+// ---- shared loader, cache, and concurrency limiter ----
+const sharedLoader = new GLTFLoader();
+const gltfCache = new Map<string, Promise<THREE.Group>>();
+
+const MAX_CONCURRENT = 4;
+let active = 0;
+const queue: Array<() => void> = [];
+const runNext = () => {
+  if (active >= MAX_CONCURRENT) return;
+  const job = queue.shift();
+  if (!job) return;
+  active++;
+  job();
+};
+const schedule = <T,>(job: () => Promise<T>): Promise<T> =>
+  new Promise((resolve, reject) => {
+    queue.push(() => {
+      job()
+        .then(resolve, reject)
+        .finally(() => {
+          active--;
+          runNext();
+        });
+    });
+    runNext();
+  });
+
+const loadGlb = (file: string): Promise<THREE.Group> => {
+  let p = gltfCache.get(file);
+  if (p) return p;
+  p = schedule(
+    () =>
+      new Promise<THREE.Group>((resolve, reject) => {
+        sharedLoader.load(
+          `${GLB_BASE}${file}`,
+          (gltf) => resolve(gltf.scene),
+          undefined,
+          (err) => reject(err)
+        );
+      })
+  );
+  gltfCache.set(file, p);
+  return p;
+};
+
 export const GlbPreview = ({ file, enabled }: Props) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -20,6 +65,8 @@ export const GlbPreview = ({ file, enabled }: Props) => {
 
     let renderer: THREE.WebGLRenderer;
     let frameId = 0;
+    let visible = true;
+    let disposed = false;
     let controls: OrbitControls | null = null;
     const scene = new THREE.Scene();
     const w = mount.clientWidth || 240;
@@ -30,7 +77,7 @@ export const GlbPreview = ({ file, enabled }: Props) => {
 
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(1);
       renderer.setSize(w, h);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       mount.appendChild(renderer.domElement);
@@ -58,11 +105,10 @@ export const GlbPreview = ({ file, enabled }: Props) => {
     const clock = new THREE.Clock();
     let pivot: THREE.Object3D | null = null;
 
-    const loader = new GLTFLoader();
-    loader.load(
-      `${GLB_BASE}${file}`,
-      (gltf) => {
-        const obj = gltf.scene;
+    loadGlb(file)
+      .then((sourceScene) => {
+        if (disposed) return;
+        const obj = sourceScene.clone(true);
 
         // First measure raw bounds and normalize scale to ~1.6 units
         const rawBox = new THREE.Box3().setFromObject(obj);
@@ -99,19 +145,15 @@ export const GlbPreview = ({ file, enabled }: Props) => {
           controls.maxDistance = distance * 5;
           controls.update();
         }
-
-        if (gltf.animations && gltf.animations.length) {
-          mixer = new THREE.AnimationMixer(obj);
-          mixer.clipAction(gltf.animations[0]).play();
-        }
         setStatus("ready");
-      },
-      undefined,
-      () => setStatus("error")
-    );
+      })
+      .catch(() => {
+        if (!disposed) setStatus("error");
+      });
 
     const animate = () => {
       frameId = requestAnimationFrame(animate);
+      if (!visible) return;
       const dt = clock.getDelta();
       if (mixer) mixer.update(dt);
       if (pivot) pivot.rotation.y += dt * 0.4;
@@ -130,17 +172,29 @@ export const GlbPreview = ({ file, enabled }: Props) => {
     });
     ro.observe(mount);
 
+    // Pause rendering when card scrolls off-screen
+    const vio = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          visible = e.isIntersecting;
+          if (visible) clock.getDelta(); // reset delta to avoid jump
+        }
+      },
+      { rootMargin: "100px" }
+    );
+    vio.observe(mount);
+
     return () => {
+      disposed = true;
       cancelAnimationFrame(frameId);
       ro.disconnect();
+      vio.disconnect();
       controls?.dispose();
       renderer.dispose();
       scene.traverse((o) => {
         const mesh = o as THREE.Mesh;
-        if (mesh.geometry) mesh.geometry.dispose();
-        const m = mesh.material as THREE.Material | THREE.Material[] | undefined;
-        if (Array.isArray(m)) m.forEach((mm) => mm.dispose());
-        else if (m) m.dispose();
+        // Don't dispose geometry/material — they're shared with the cached source scene
+        void mesh;
       });
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
