@@ -59,27 +59,14 @@ const idbSet = async (key: string, val: string): Promise<void> => {
   }
 };
 
-let active = 0;
-const queue: Array<() => void> = [];
-const runNext = () => {
-  if (active >= MAX_CONCURRENT) return;
-  const job = queue.shift();
-  if (!job) return;
-  active++;
-  job();
+// Serialize thumbnail renders — a single shared WebGL renderer cannot be
+// used by multiple jobs at once (canvas gets overwritten → blank thumbs).
+let renderChain: Promise<unknown> = Promise.resolve();
+const schedule = <T,>(job: () => Promise<T>): Promise<T> => {
+  const next = renderChain.then(job, job);
+  renderChain = next.catch(() => {});
+  return next;
 };
-const schedule = <T,>(job: () => Promise<T>): Promise<T> =>
-  new Promise((resolve, reject) => {
-    queue.push(() => {
-      job()
-        .then(resolve, reject)
-        .finally(() => {
-          active--;
-          runNext();
-        });
-    });
-    runNext();
-  });
 
 const loadGlb = (file: string): Promise<THREE.Group> => {
   let p = gltfCache.get(file);
@@ -154,10 +141,12 @@ const getThumb = (file: string): Promise<string> => {
   let p = thumbCache.get(file);
   if (p) return p;
   p = (async () => {
-    const cached = await idbGet(file);
-    if (cached) return cached;
+    const key = `v2:${file}`;
+    const cached = await idbGet(key);
+    if (cached && cached.length > 2000) return cached;
+    // Serialize renders — one shared WebGL renderer can't be used in parallel
     const url = await schedule(() => renderThumb(file));
-    idbSet(file, url);
+    if (url && url.length > 2000) idbSet(key, url);
     return url;
   })().catch((e) => {
     thumbCache.delete(file);
