@@ -156,8 +156,8 @@ const getThumb = (file: string): Promise<string> => {
   p = (async () => {
     const key = `v2:${file}`;
     const cached = await idbGet(key);
-    // Guard against previously cached blank/broken thumbnails
     if (cached && cached.length > 2000) return cached;
+    // Serialize renders — one shared WebGL renderer can't be used in parallel
     const url = await schedule(() => renderThumb(file));
     if (url && url.length > 2000) idbSet(key, url);
     return url;
