@@ -14,7 +14,7 @@ const sharedLoader = new GLTFLoader();
 const gltfCache = new Map<string, Promise<THREE.Group>>();
 const thumbCache = new Map<string, Promise<string>>();
 
-const MAX_CONCURRENT = 2;
+const MAX_CONCURRENT = 6;
 
 // ---- persistent thumbnail cache (IndexedDB) ----
 const IDB_NAME = "glb-thumbs";
