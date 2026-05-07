@@ -6,63 +6,63 @@
 
 @layer base {
   :root {
-    /* Desktop wallpaper — beige paper with dot grid */
-    --desktop: 45 28% 92%;
-    --desktop-dot: 40 12% 70%;
+    /* Desktop wallpaper — Clay Nation sky/meadow */
+    --desktop: 195 70% 78%;
+    --desktop-dot: 200 45% 62%;
 
-    /* Surfaces */
-    --background: 45 28% 92%;
-    --foreground: 0 0% 12%;
+    /* Surfaces — soft cream paper */
+    --background: 195 70% 78%;
+    --foreground: 220 35% 14%;
 
-    --window: 40 22% 96%;
-    --window-foreground: 0 0% 12%;
-    --window-chrome: 40 18% 88%;
-    --window-border: 0 0% 18%;
+    --window: 40 60% 97%;
+    --window-foreground: 220 35% 14%;
+    --window-chrome: 145 35% 78%;
+    --window-border: 220 40% 16%;
 
-    --card: 40 22% 96%;
-    --card-foreground: 0 0% 12%;
+    --card: 40 60% 97%;
+    --card-foreground: 220 35% 14%;
 
-    --popover: 40 22% 96%;
-    --popover-foreground: 0 0% 12%;
+    --popover: 40 60% 97%;
+    --popover-foreground: 220 35% 14%;
 
-    --primary: 0 0% 12%;
-    --primary-foreground: 40 22% 96%;
+    --primary: 220 40% 16%;
+    --primary-foreground: 40 60% 97%;
 
-    --secondary: 40 18% 88%;
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 145 35% 78%;
+    --secondary-foreground: 220 35% 14%;
 
-    --muted: 40 14% 84%;
-    --muted-foreground: 0 0% 38%;
+    --muted: 145 25% 84%;
+    --muted-foreground: 220 20% 32%;
 
-    --accent: 210 60% 56%;
+    --accent: 325 78% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 18%;
+    --border: 220 40% 16%;
+    --input: 220 40% 16%;
+    --ring: 325 78% 58%;
 
-    /* Pixel folder pastel palette */
-    --folder-pink: 350 70% 80%;
-    --folder-purple: 280 45% 78%;
-    --folder-blue: 200 55% 75%;
-    --folder-green: 150 40% 70%;
-    --folder-yellow: 45 80% 70%;
-    --folder-orange: 25 80% 72%;
-    --folder-teal: 170 45% 70%;
-    --folder-coral: 10 75% 75%;
+    /* Pixel folder palette — Clay Nation vibrant */
+    --folder-pink: 325 78% 70%;
+    --folder-purple: 270 60% 70%;
+    --folder-blue: 200 75% 60%;
+    --folder-green: 130 55% 55%;
+    --folder-yellow: 45 90% 62%;
+    --folder-orange: 18 90% 62%;
+    --folder-teal: 175 60% 55%;
+    --folder-coral: 5 85% 68%;
 
-    /* Tag colors */
-    --tag-glb-bg: 150 50% 88%;
-    --tag-glb-fg: 165 70% 22%;
-    --tag-fbx-bg: 245 70% 92%;
-    --tag-fbx-fg: 245 50% 38%;
-    --tag-zip-bg: 35 80% 88%;
-    --tag-zip-fg: 28 70% 28%;
-    --tag-folder-bg: 210 70% 90%;
-    --tag-folder-fg: 210 70% 35%;
+    /* Tag colors — punchy */
+    --tag-glb-bg: 130 65% 85%;
+    --tag-glb-fg: 145 75% 22%;
+    --tag-fbx-bg: 270 75% 92%;
+    --tag-fbx-fg: 270 60% 36%;
+    --tag-zip-bg: 35 90% 85%;
+    --tag-zip-fg: 22 80% 28%;
+    --tag-folder-bg: 325 80% 90%;
+    --tag-folder-fg: 325 70% 32%;
 
     --radius: 4px;
 
@@ -132,12 +132,20 @@
     font-family: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
   }
 
-  /* Dotted wallpaper background */
+  /* Clay Nation sky → meadow wallpaper */
   .desktop-bg {
     background-color: hsl(var(--desktop));
-    background-image: radial-gradient(hsl(var(--desktop-dot)) 1px, transparent 1px);
-    background-size: 14px 14px;
-    background-position: 0 0;
+    background-image:
+      radial-gradient(hsl(var(--desktop-dot) / 0.35) 1px, transparent 1px),
+      linear-gradient(
+        to bottom,
+        hsl(200 80% 72%) 0%,
+        hsl(195 70% 78%) 35%,
+        hsl(145 55% 70%) 70%,
+        hsl(130 55% 55%) 100%
+      );
+    background-size: 14px 14px, 100% 100%;
+    background-position: 0 0, 0 0;
   }
 
   /* Pixelated rendering for icons */
