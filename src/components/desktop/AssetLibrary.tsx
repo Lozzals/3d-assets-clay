@@ -2,6 +2,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ASSETS, CATEGORY_ICONS, MANIFEST_URL, type Asset } from "@/data/assets";
 import { GlbPreview } from "@/components/GlbPreview";
 
+// Files present in the R2 manifest but intentionally hidden from the library.
+const EXCLUDED_FILES = new Set<string>([
+  "pablito_hoverfly_baked_(1).glb",
+  "pablito_sit_baked_(1).glb",
+  "pablito_walk_baked_(1).glb",
+]);
+
 const tagClass = (t: Asset["t"]) => {
   switch (t) {
     case "glb":
@@ -81,7 +88,13 @@ export const AssetLibrary = () => {
     fetch(MANIFEST_URL)
       .then((r) => r.json())
       .then((files: string[]) => {
-        setAvailable(new Set(files.map((f) => f.toLowerCase())));
+        setAvailable(
+          new Set(
+            files
+              .map((f) => f.toLowerCase())
+              .filter((f) => !EXCLUDED_FILES.has(f))
+          )
+        );
       })
       .catch(() => setAvailable(new Set()));
   }, []);
