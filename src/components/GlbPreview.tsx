@@ -84,17 +84,14 @@ const schedule = <T,>(job: () => Promise<T>): Promise<T> =>
 const loadGlb = (file: string): Promise<THREE.Group> => {
   let p = gltfCache.get(file);
   if (p) return p;
-  p = schedule(
-    () =>
-      new Promise<THREE.Group>((resolve, reject) => {
-        sharedLoader.load(
-          `${GLB_BASE}${file}`,
-          (gltf) => resolve(gltf.scene),
-          undefined,
-          (err) => reject(err)
-        );
-      })
-  );
+  p = new Promise<THREE.Group>((resolve, reject) => {
+    sharedLoader.load(
+      `${GLB_BASE}${file}`,
+      (gltf) => resolve(gltf.scene),
+      undefined,
+      (err) => reject(err)
+    );
+  });
   gltfCache.set(file, p);
   return p;
 };
