@@ -102,7 +102,7 @@ const AssetCard = ({ asset }: CardProps) => {
 export const AssetLibrary = () => {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string>("All");
-  const [group, setGroup] = useState<Group>("All");
+  const [group, setGroup] = useState<Group>("Characters");
   const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
 
@@ -124,7 +124,7 @@ export const AssetLibrary = () => {
   const categories = useMemo(() => {
     const cats = Array.from(
       new Set(
-        ASSETS.filter((a) => group === "All" || groupOf(a.c) === group).map((a) => a.c)
+        ASSETS.filter((a) => groupOf(a.c) === group).map((a) => a.c)
       )
     ).sort();
     return ["All", ...cats];
@@ -137,7 +137,7 @@ export const AssetLibrary = () => {
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
-      const matchGroup = group === "All" || groupOf(a.c) === group;
+      const matchGroup = groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
       const matchQ =
