@@ -14,7 +14,51 @@ const sharedLoader = new GLTFLoader();
 const gltfCache = new Map<string, Promise<THREE.Group>>();
 const thumbCache = new Map<string, Promise<string>>();
 
-const MAX_CONCURRENT = 3;
+const MAX_CONCURRENT = 2;
+
+// ---- persistent thumbnail cache (IndexedDB) ----
+const IDB_NAME = "glb-thumbs";
+const IDB_STORE = "thumbs";
+let idbPromise: Promise<IDBDatabase | null> | null = null;
+const openIdb = (): Promise<IDBDatabase | null> => {
+  if (idbPromise) return idbPromise;
+  idbPromise = new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+  return idbPromise;
+};
+const idbGet = async (key: string): Promise<string | null> => {
+  const db = await openIdb();
+  if (!db) return null;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, "readonly");
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = () => resolve((req.result as string) ?? null);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+};
+const idbSet = async (key: string, val: string): Promise<void> => {
+  const db = await openIdb();
+  if (!db) return;
+  try {
+    const tx = db.transaction(IDB_STORE, "readwrite");
+    tx.objectStore(IDB_STORE).put(val, key);
+  } catch {
+    /* ignore */
+  }
+};
+
 let active = 0;
 const queue: Array<() => void> = [];
 const runNext = () => {
@@ -56,7 +100,7 @@ const loadGlb = (file: string): Promise<THREE.Group> => {
 };
 
 // ---- one shared offscreen renderer for thumbnails ----
-const THUMB_SIZE = 256;
+const THUMB_SIZE = 192;
 let thumbRenderer: THREE.WebGLRenderer | null = null;
 const getThumbRenderer = () => {
   if (thumbRenderer) return thumbRenderer;
@@ -112,7 +156,13 @@ const renderThumb = async (file: string): Promise<string> => {
 const getThumb = (file: string): Promise<string> => {
   let p = thumbCache.get(file);
   if (p) return p;
-  p = schedule(() => renderThumb(file)).catch((e) => {
+  p = (async () => {
+    const cached = await idbGet(file);
+    if (cached) return cached;
+    const url = await schedule(() => renderThumb(file));
+    idbSet(file, url);
+    return url;
+  })().catch((e) => {
     thumbCache.delete(file);
     throw e;
   });
