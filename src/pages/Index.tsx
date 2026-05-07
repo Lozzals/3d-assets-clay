@@ -1,10 +1,14 @@
 import { AssetLibrary } from "@/components/desktop/AssetLibrary";
 import { Minus, Square, X } from "lucide-react";
+import wallpaper from "@/assets/wallpaper.webp";
 
 const Index = () => {
   const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   return (
-    <div className="desktop-bg fixed inset-0 flex flex-col overflow-hidden p-4 pb-12">
+    <div
+      className="fixed inset-0 flex flex-col overflow-hidden bg-cover bg-center p-4 pb-12"
+      style={{ backgroundImage: `url(${wallpaper})` }}
+    >
       {/* Window */}
       <div className="os-window mx-auto flex h-full w-full max-w-[1400px] flex-col overflow-hidden">
         {/* Titlebar */}
