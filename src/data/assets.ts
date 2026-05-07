@@ -440,4 +440,6 @@ export const ASSETS: Asset[] = [
   { n: "Stage Railing Ramp", f: "Stage_RailingRamp.glb", t: "glb", c: "Misc" },
   { n: "Stage Ramp", f: "Stage_Ramp.glb", t: "glb", c: "Misc" },
   { n: "Stage Step", f: "Stage_Step1.glb", t: "glb", c: "Misc" },
+  { n: "Big Tent", f: "BigTent.glb", t: "glb", c: "Misc" },
+{ n: "Tree House", f: "TreeHouse.glb", t: "glb", c: "Misc" },
 ];
