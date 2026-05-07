@@ -63,7 +63,7 @@ const AssetCard = ({ asset }: CardProps) => {
           }
         });
       },
-      { rootMargin: "400px" }
+      { rootMargin: "100px" }
     );
     io.observe(el);
     return () => io.disconnect();
