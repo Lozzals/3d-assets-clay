@@ -9,6 +9,27 @@ const EXCLUDED_FILES = new Set<string>([
   "pablito_walk_baked_(1).glb",
 ]);
 
+// Top-level groups — split character parts from world/building assets.
+const CHARACTER_CATEGORIES = new Set([
+  "Accessories", "Hats", "Clothes", "Eyes", "Mouths", "Hair", "Body", "Face",
+]);
+const ANIMATION_CATEGORIES = new Set(["Animations", "Creatures"]);
+
+type Group = "All" | "Characters" | "World" | "Animations";
+
+const groupOf = (cat: string): Exclude<Group, "All"> => {
+  if (CHARACTER_CATEGORIES.has(cat)) return "Characters";
+  if (ANIMATION_CATEGORIES.has(cat)) return "Animations";
+  return "World";
+};
+
+const GROUP_META: { id: Group; label: string; icon: string }[] = [
+  { id: "All", label: "All", icon: "✦" },
+  { id: "Characters", label: "Characters", icon: "🧑" },
+  { id: "World", label: "World & Build", icon: "🏗" },
+  { id: "Animations", label: "Anim & Creatures", icon: "🎬" },
+];
+
 const tagClass = (t: Asset["t"]) => {
   switch (t) {
     case "glb":
@@ -82,6 +103,8 @@ const AssetCard = ({ asset }: CardProps) => {
 export const AssetLibrary = () => {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string>("All");
+  const [group, setGroup] = useState<Group>("All");
+  const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
 
   useEffect(() => {
@@ -99,10 +122,23 @@ export const AssetLibrary = () => {
       .catch(() => setAvailable(new Set()));
   }, []);
 
-  const categories = useMemo(() => ["All", ...Array.from(new Set(ASSETS.map((a) => a.c)))], []);
+  const categories = useMemo(() => {
+    const cats = Array.from(
+      new Set(
+        ASSETS.filter((a) => group === "All" || groupOf(a.c) === group).map((a) => a.c)
+      )
+    ).sort();
+    return ["All", ...cats];
+  }, [group]);
+
+  // If active category leaves the current group, snap back to All.
+  useEffect(() => {
+    if (cat !== "All" && !categories.includes(cat)) setCat("All");
+  }, [categories, cat]);
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
+      const matchGroup = group === "All" || groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
       const matchQ =
@@ -112,9 +148,9 @@ export const AssetLibrary = () => {
         (a.by ?? "").toLowerCase().includes(q);
       const inManifest =
         a.t !== "glb" || !available || available.size === 0 || (a.f && available.has(a.f.toLowerCase()));
-      return matchCat && matchQ && inManifest;
+      return matchGroup && matchCat && matchQ && inManifest;
     });
-  }, [query, cat, available]);
+  }, [query, cat, group, available]);
 
   const grouped = useMemo(() => {
     const g: Record<string, Asset[]> = {};
@@ -140,7 +176,38 @@ export const AssetLibrary = () => {
           placeholder="Search by name, category…"
           className="ml-2 w-[220px] rounded-md border border-window-border bg-window px-2.5 py-1 text-[11px] outline-none focus:border-accent"
         />
+        <button
+          onClick={() => setShowCats((v) => !v)}
+          className="ml-1 rounded border border-window-border bg-window px-2 py-1 text-[10px] font-semibold uppercase tracking-wider hover:bg-muted"
+          title={showCats ? "Hide categories" : "Show categories"}
+        >
+          {showCats ? "▾ Hide cats" : "▸ Show cats"}
+        </button>
         <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} assets</div>
+      </div>
+
+      {/* Retro group selector — pixel segmented control */}
+      <div className="flex items-stretch gap-0 border-b border-window-border bg-window px-3 py-2">
+        {GROUP_META.map((g) => {
+          const active = group === g.id;
+          return (
+            <button
+              key={g.id}
+              onClick={() => {
+                setGroup(g.id);
+                setCat("All");
+              }}
+              className={`-ml-px flex items-center gap-1.5 border-[1.5px] border-window-border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider first:ml-0 first:rounded-l-[4px] last:rounded-r-[4px] transition-colors ${
+                active
+                  ? "bg-accent text-accent-foreground shadow-[inset_2px_2px_0_hsl(var(--window-border)/0.25)]"
+                  : "bg-window text-foreground hover:bg-muted"
+              }`}
+            >
+              <span>{g.icon}</span>
+              <span>{g.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Stats */}
@@ -158,6 +225,7 @@ export const AssetLibrary = () => {
       </div>
 
       {/* Filters — pixel tabs */}
+      {showCats && (
       <div className="flex flex-wrap items-end gap-1 border-b border-window-border bg-window-chrome/40 px-3 pt-2">
         {categories.map((c) => {
           const active = cat === c;
@@ -182,6 +250,7 @@ export const AssetLibrary = () => {
           );
         })}
       </div>
+      )}
 
       {/* Grid */}
       <div className="flex-1 overflow-auto p-3">
