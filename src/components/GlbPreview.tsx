@@ -154,10 +154,12 @@ const getThumb = (file: string): Promise<string> => {
   let p = thumbCache.get(file);
   if (p) return p;
   p = (async () => {
-    const cached = await idbGet(file);
-    if (cached) return cached;
+    const key = `v2:${file}`;
+    const cached = await idbGet(key);
+    // Guard against previously cached blank/broken thumbnails
+    if (cached && cached.length > 2000) return cached;
     const url = await schedule(() => renderThumb(file));
-    idbSet(file, url);
+    if (url && url.length > 2000) idbSet(key, url);
     return url;
   })().catch((e) => {
     thumbCache.delete(file);
