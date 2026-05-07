@@ -194,7 +194,7 @@ export const GlbPreview = ({ file, enabled }: Props) => {
       onMouseEnter={() => status === "ready" && setInteractive(true)}
       onMouseLeave={() => setInteractive(false)}
     >
-      {thumb && (
+      {thumb && !interactive && (
         <img
           src={thumb}
           alt=""
