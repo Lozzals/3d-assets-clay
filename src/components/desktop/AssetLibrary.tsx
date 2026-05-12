@@ -25,7 +25,6 @@ const groupOf = (cat: string): Group => {
 
 const GROUP_META: { id: Group; label: string; icon: string }[] = [
   { id: "World", label: "World & Build", icon: "🏗" },
-  { id: "Characters", label: "Characters", icon: "🧑" },
   { id: "Creatures", label: "Creatures", icon: "🦎" },
 ];
 
@@ -102,7 +101,7 @@ const AssetCard = ({ asset }: CardProps) => {
 export const AssetLibrary = () => {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string>("All");
-  const [group, setGroup] = useState<Group>("Characters");
+  const [group, setGroup] = useState<Group>("World");
   const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
 
@@ -137,6 +136,7 @@ export const AssetLibrary = () => {
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
+      if (groupOf(a.c) === "Characters") return false;
       const matchGroup = groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
