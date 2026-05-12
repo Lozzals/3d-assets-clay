@@ -169,16 +169,17 @@ const getThumb = (file: string, q: "hd" | "sd"): Promise<string> => {
 
 export const GlbPreview = ({ file, enabled, fallback }: Props) => {
   const { quality } = useQuality();
-  const sd = quality === "sd";
+  const q: "hd" | "sd" = quality === "sd" ? "sd" : "hd";
+  const sd = q === "sd";
   const [thumb, setThumb] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [interactive, setInteractive] = useState(false);
 
   useEffect(() => {
-    if (!enabled || sd) return;
+    if (!enabled) return;
     let cancelled = false;
     setStatus("loading");
-    getThumb(file)
+    getThumb(file, q)
       .then((url) => {
         if (cancelled) return;
         setThumb(url);
@@ -188,33 +189,28 @@ export const GlbPreview = ({ file, enabled, fallback }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [enabled, file, sd]);
+  }, [enabled, file, q]);
 
   return (
     <div
       className="absolute inset-0 cursor-pointer"
-      onMouseEnter={() => (sd || status === "ready") && setInteractive(true)}
+      onMouseEnter={() => status === "ready" && setInteractive(true)}
       onMouseLeave={() => setInteractive(false)}
     >
-      {!sd && thumb && !interactive && (
+      {thumb && !interactive && (
         <img
           src={thumb}
           alt=""
           loading="lazy"
           className="absolute inset-0 h-full w-full object-contain"
-          style={{ imageRendering: "auto" }}
+          style={{ imageRendering: sd ? "pixelated" : "auto" }}
         />
       )}
-      {sd && !interactive && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          {fallback ?? <span className="text-4xl opacity-60">📦</span>}
-        </div>
-      )}
       {interactive && <LiveView file={file} />}
-      {!sd && status !== "ready" && (
+      {status !== "ready" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/40 text-[10px] text-muted-foreground">
           {status === "error" ? (
-            <span>preview unavailable</span>
+            fallback ?? <span>preview unavailable</span>
           ) : (
             <>
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-accent" />
