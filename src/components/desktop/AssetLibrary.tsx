@@ -114,6 +114,7 @@ export const AssetLibrary = () => {
   const [group, setGroup] = useState<Group>("World");
   const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
+  const { quality, setQuality } = useQuality();
 
   useEffect(() => {
     fetch(MANIFEST_URL)
@@ -197,6 +198,23 @@ export const AssetLibrary = () => {
           {showCats ? "▾ Hide categories" : "▸ Show categories"}
         </button>
         <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} assets</div>
+        <div className="flex items-center overflow-hidden rounded border border-window-border">
+          {(["hd", "sd"] as const).map((q) => {
+            const active = quality === q;
+            return (
+              <button
+                key={q}
+                onClick={() => setQuality(q)}
+                className={`px-2 py-1 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                  active ? "bg-accent text-accent-foreground" : "bg-window text-muted-foreground hover:bg-muted"
+                }`}
+                title={q === "hd" ? "HD: live 3D thumbnails" : "Lite: icons, 3D on hover"}
+              >
+                {q === "hd" ? "HD" : "Lite"}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Retro group selector — pixel segmented control */}
