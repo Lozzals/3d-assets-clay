@@ -13,19 +13,20 @@ const EXCLUDED_FILES = new Set<string>([
 const CHARACTER_CATEGORIES = new Set([
   "Accessories", "Hats", "Clothes", "Eyes", "Mouths", "Hair", "Body", "Face",
 ]);
-const ANIMATION_CATEGORIES = new Set(["Animations", "Creatures"]);
+const CREATURE_CATEGORIES = new Set(["Creatures"]);
 
-type Group = "Characters" | "World" | "Animations";
+type Group = "Characters" | "World" | "Creatures";
 
 const groupOf = (cat: string): Group => {
   if (CHARACTER_CATEGORIES.has(cat)) return "Characters";
-  if (ANIMATION_CATEGORIES.has(cat)) return "Animations";
+  if (CREATURE_CATEGORIES.has(cat)) return "Creatures";
   return "World";
 };
 
 const GROUP_META: { id: Group; label: string; icon: string }[] = [
   { id: "World", label: "World & Build", icon: "🏗" },
   { id: "Characters", label: "Characters", icon: "🧑" },
+  { id: "Creatures", label: "Creatures", icon: "🦎" },
 ];
 
 const tagClass = (t: Asset["t"]) => {
@@ -136,7 +137,6 @@ export const AssetLibrary = () => {
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
-      if (groupOf(a.c) === "Animations") return false;
       const matchGroup = groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
