@@ -26,7 +26,6 @@ const groupOf = (cat: string): Group => {
 const GROUP_META: { id: Group; label: string; icon: string }[] = [
   { id: "World", label: "World & Build", icon: "🏗" },
   { id: "Animations", label: "Creatures", icon: "🎬" },
-  { id: "Characters", label: "Characters", icon: "🧑" },
 ];
 
 const tagClass = (t: Asset["t"]) => {
@@ -137,6 +136,7 @@ export const AssetLibrary = () => {
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
+      if (groupOf(a.c) === "Characters") return false;
       const matchGroup = groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
