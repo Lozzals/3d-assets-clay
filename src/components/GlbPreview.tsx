@@ -86,8 +86,8 @@ const loadGlb = (file: string): Promise<THREE.Group> => {
 };
 
 // ---- one shared offscreen renderer for thumbnails ----
-const HD_SIZE = 192;
-const SD_SIZE = 96;
+const HD_SIZE = 256;
+const SD_SIZE = 160;
 const thumbRenderers: Record<"hd" | "sd", THREE.WebGLRenderer | null> = { hd: null, sd: null };
 const getThumbRenderer = (q: "hd" | "sd") => {
   if (thumbRenderers[q]) return thumbRenderers[q]!;
@@ -203,7 +203,7 @@ export const GlbPreview = ({ file, enabled, fallback }: Props) => {
           alt=""
           loading="lazy"
           className="absolute inset-0 h-full w-full object-contain"
-          style={{ imageRendering: sd ? "pixelated" : "auto" }}
+          style={{ imageRendering: "auto" }}
         />
       )}
       {interactive && <LiveView file={file} />}
