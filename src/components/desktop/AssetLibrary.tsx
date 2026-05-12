@@ -102,7 +102,7 @@ const AssetCard = ({ asset }: CardProps) => {
 export const AssetLibrary = () => {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<string>("All");
-  const [group, setGroup] = useState<Group>("Characters");
+  const [group, setGroup] = useState<Group>("World");
   const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
 
