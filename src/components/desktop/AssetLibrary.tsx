@@ -107,8 +107,12 @@ export const AssetLibrary = () => {
 
   useEffect(() => {
     fetch(MANIFEST_URL)
-      .then((r) => r.json())
-      .then((files: string[]) => {
+      .then((r) => r.text())
+      .then((text) => {
+        // Manifest is hand-maintained and sometimes has trailing commas;
+        // strip them so JSON.parse doesn't throw and silently disable filtering.
+        const cleaned = text.replace(/,(\s*[\]}])/g, "$1");
+        const files: string[] = JSON.parse(cleaned);
         setAvailable(
           new Set(
             files
