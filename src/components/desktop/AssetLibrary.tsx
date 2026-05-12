@@ -13,13 +13,13 @@ const EXCLUDED_FILES = new Set<string>([
 const CHARACTER_CATEGORIES = new Set([
   "Accessories", "Hats", "Clothes", "Eyes", "Mouths", "Hair", "Body", "Face",
 ]);
-const ANIMATION_CATEGORIES = new Set(["Animations", "Creatures"]);
+const CREATURE_CATEGORIES = new Set(["Creatures"]);
 
-type Group = "Characters" | "World" | "Animations";
+type Group = "Characters" | "World" | "Creatures";
 
 const groupOf = (cat: string): Group => {
   if (CHARACTER_CATEGORIES.has(cat)) return "Characters";
-  if (ANIMATION_CATEGORIES.has(cat)) return "Animations";
+  if (CREATURE_CATEGORIES.has(cat)) return "Creatures";
   return "World";
 };
 
