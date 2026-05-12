@@ -179,7 +179,6 @@ export const ASSETS: Asset[] = [
   { n: "Drum", f: "Drum_low.glb", t: "glb", c: "Instruments" },
   { n: "Flute", f: "Flute_low.glb", t: "glb", c: "Instruments" },
   { n: "Circle Keyboard", f: "CircleKeyboard_low.glb", t: "glb", c: "Instruments" },
-  { n: "Guitars Pack", t: "zip", c: "Instruments" },
   // SIGNS
   { n: "Blade Signs 1–5", f: "BladeSign_low.glb", t: "glb", c: "Signs" },
   { n: "Blade Sign 11 Vintage", f: "BladeSign_low.glb", t: "glb", c: "Signs" },
