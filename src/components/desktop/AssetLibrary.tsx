@@ -25,7 +25,6 @@ const groupOf = (cat: string): Group => {
 
 const GROUP_META: { id: Group; label: string; icon: string }[] = [
   { id: "World", label: "World & Build", icon: "🏗" },
-  { id: "Animations", label: "Creatures", icon: "🎬" },
 ];
 
 const tagClass = (t: Asset["t"]) => {
