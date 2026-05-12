@@ -86,18 +86,26 @@ const loadGlb = (file: string): Promise<THREE.Group> => {
 };
 
 // ---- one shared offscreen renderer for thumbnails ----
-const THUMB_SIZE = 192;
-let thumbRenderer: THREE.WebGLRenderer | null = null;
-const getThumbRenderer = () => {
-  if (thumbRenderer) return thumbRenderer;
-  thumbRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-  thumbRenderer.setPixelRatio(1);
-  thumbRenderer.setSize(THUMB_SIZE, THUMB_SIZE);
-  thumbRenderer.outputColorSpace = THREE.SRGBColorSpace;
-  return thumbRenderer;
+const HD_SIZE = 192;
+const SD_SIZE = 96;
+const thumbRenderers: Record<"hd" | "sd", THREE.WebGLRenderer | null> = { hd: null, sd: null };
+const getThumbRenderer = (q: "hd" | "sd") => {
+  if (thumbRenderers[q]) return thumbRenderers[q]!;
+  const size = q === "hd" ? HD_SIZE : SD_SIZE;
+  const r = new THREE.WebGLRenderer({
+    antialias: q === "hd",
+    alpha: true,
+    preserveDrawingBuffer: true,
+    powerPreference: q === "sd" ? "low-power" : "high-performance",
+  });
+  r.setPixelRatio(1);
+  r.setSize(size, size);
+  r.outputColorSpace = THREE.SRGBColorSpace;
+  thumbRenderers[q] = r;
+  return r;
 };
 
-const renderThumb = async (file: string): Promise<string> => {
+const renderThumb = async (file: string, q: "hd" | "sd"): Promise<string> => {
   const source = await loadGlb(file);
   const obj = source.clone(true);
 
@@ -131,45 +139,47 @@ const renderThumb = async (file: string): Promise<string> => {
   camera.lookAt(0, 0, 0);
   camera.updateProjectionMatrix();
 
-  const r = getThumbRenderer();
+  const r = getThumbRenderer(q);
   r.render(scene, camera);
-  const url = r.domElement.toDataURL("image/webp", 0.85);
+  const url = r.domElement.toDataURL("image/webp", q === "hd" ? 0.85 : 0.7);
 
   // dispose this scene's clones (geometries are shared with cache, skip)
   return url;
 };
 
-const getThumb = (file: string): Promise<string> => {
-  let p = thumbCache.get(file);
+const getThumb = (file: string, q: "hd" | "sd"): Promise<string> => {
+  const cacheKey = `${q}:${file}`;
+  let p = thumbCache.get(cacheKey);
   if (p) return p;
   p = (async () => {
-    const key = `v2:${file}`;
+    const key = `v3-${q}:${file}`;
     const cached = await idbGet(key);
     if (cached && cached.length > 2000) return cached;
     // Serialize renders — one shared WebGL renderer can't be used in parallel
-    const url = await schedule(() => renderThumb(file));
+    const url = await schedule(() => renderThumb(file, q));
     if (url && url.length > 2000) idbSet(key, url);
     return url;
   })().catch((e) => {
-    thumbCache.delete(file);
+    thumbCache.delete(cacheKey);
     throw e;
   });
-  thumbCache.set(file, p);
+  thumbCache.set(cacheKey, p);
   return p;
 };
 
 export const GlbPreview = ({ file, enabled, fallback }: Props) => {
   const { quality } = useQuality();
-  const sd = quality === "sd";
+  const q: "hd" | "sd" = quality === "sd" ? "sd" : "hd";
+  const sd = q === "sd";
   const [thumb, setThumb] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [interactive, setInteractive] = useState(false);
 
   useEffect(() => {
-    if (!enabled || sd) return;
+    if (!enabled) return;
     let cancelled = false;
     setStatus("loading");
-    getThumb(file)
+    getThumb(file, q)
       .then((url) => {
         if (cancelled) return;
         setThumb(url);
@@ -179,33 +189,28 @@ export const GlbPreview = ({ file, enabled, fallback }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [enabled, file, sd]);
+  }, [enabled, file, q]);
 
   return (
     <div
       className="absolute inset-0 cursor-pointer"
-      onMouseEnter={() => (sd || status === "ready") && setInteractive(true)}
+      onMouseEnter={() => status === "ready" && setInteractive(true)}
       onMouseLeave={() => setInteractive(false)}
     >
-      {!sd && thumb && !interactive && (
+      {thumb && !interactive && (
         <img
           src={thumb}
           alt=""
           loading="lazy"
           className="absolute inset-0 h-full w-full object-contain"
-          style={{ imageRendering: "auto" }}
+          style={{ imageRendering: sd ? "pixelated" : "auto" }}
         />
       )}
-      {sd && !interactive && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          {fallback ?? <span className="text-4xl opacity-60">📦</span>}
-        </div>
-      )}
       {interactive && <LiveView file={file} />}
-      {!sd && status !== "ready" && (
+      {status !== "ready" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/40 text-[10px] text-muted-foreground">
           {status === "error" ? (
-            <span>preview unavailable</span>
+            fallback ?? <span>preview unavailable</span>
           ) : (
             <>
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-accent" />
