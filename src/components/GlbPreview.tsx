@@ -3,10 +3,12 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLB_BASE } from "@/data/assets";
+import { useQuality } from "@/lib/quality";
 
 interface Props {
   file: string;
   enabled: boolean;
+  fallback?: React.ReactNode;
 }
 
 // ---- shared loader, cache, and concurrency limiter ----
@@ -156,13 +158,15 @@ const getThumb = (file: string): Promise<string> => {
   return p;
 };
 
-export const GlbPreview = ({ file, enabled }: Props) => {
+export const GlbPreview = ({ file, enabled, fallback }: Props) => {
+  const { quality } = useQuality();
+  const sd = quality === "sd";
   const [thumb, setThumb] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [interactive, setInteractive] = useState(false);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || sd) return;
     let cancelled = false;
     setStatus("loading");
     getThumb(file)
@@ -175,15 +179,15 @@ export const GlbPreview = ({ file, enabled }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [enabled, file]);
+  }, [enabled, file, sd]);
 
   return (
     <div
       className="absolute inset-0 cursor-pointer"
-      onMouseEnter={() => status === "ready" && setInteractive(true)}
+      onMouseEnter={() => (sd || status === "ready") && setInteractive(true)}
       onMouseLeave={() => setInteractive(false)}
     >
-      {thumb && !interactive && (
+      {!sd && thumb && !interactive && (
         <img
           src={thumb}
           alt=""
@@ -192,8 +196,13 @@ export const GlbPreview = ({ file, enabled }: Props) => {
           style={{ imageRendering: "auto" }}
         />
       )}
+      {sd && !interactive && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {fallback ?? <span className="text-4xl opacity-60">📦</span>}
+        </div>
+      )}
       {interactive && <LiveView file={file} />}
-      {status !== "ready" && (
+      {!sd && status !== "ready" && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/40 text-[10px] text-muted-foreground">
           {status === "error" ? (
             <span>preview unavailable</span>
@@ -212,6 +221,8 @@ export const GlbPreview = ({ file, enabled }: Props) => {
 // ---- live interactive view (only on hover) ----
 const LiveView = ({ file }: { file: string }) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const { quality } = useQuality();
+  const sd = quality === "sd";
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -226,8 +237,8 @@ const LiveView = ({ file }: { file: string }) => {
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
 
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(1);
+      renderer = new THREE.WebGLRenderer({ antialias: !sd, alpha: true, powerPreference: sd ? "low-power" : "high-performance" });
+      renderer.setPixelRatio(sd ? 1 : Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(w, h);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       mount.appendChild(renderer.domElement);

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ASSETS, CATEGORY_ICONS, MANIFEST_URL, type Asset } from "@/data/assets";
 import { GlbPreview } from "@/components/GlbPreview";
+import { useQuality } from "@/lib/quality";
 
 // Files present in the R2 manifest but intentionally hidden from the library.
 const EXCLUDED_FILES = new Set<string>([
@@ -75,7 +76,16 @@ const AssetCard = ({ asset }: CardProps) => {
     >
       <div className="relative aspect-square w-full border-b border-window-border bg-muted">
         {asset.t === "glb" && asset.f ? (
-          <GlbPreview file={asset.f} enabled={visible} />
+          <GlbPreview
+            file={asset.f}
+            enabled={visible}
+            fallback={
+              <div className="flex h-full w-full flex-col items-center justify-center gap-1.5">
+                <span className="text-4xl opacity-60">{CATEGORY_ICONS[asset.c] || "📦"}</span>
+                <span className="text-[9px] uppercase tracking-wider text-muted-foreground">hover to view</span>
+              </div>
+            }
+          />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2">
             <span className="text-4xl opacity-60">{CATEGORY_ICONS[asset.c] || "📦"}</span>
@@ -104,6 +114,7 @@ export const AssetLibrary = () => {
   const [group, setGroup] = useState<Group>("World");
   const [showCats, setShowCats] = useState(true);
   const [available, setAvailable] = useState<Set<string> | null>(null);
+  const { quality, setQuality } = useQuality();
 
   useEffect(() => {
     fetch(MANIFEST_URL)
@@ -187,6 +198,23 @@ export const AssetLibrary = () => {
           {showCats ? "▾ Hide categories" : "▸ Show categories"}
         </button>
         <div className="ml-auto text-[11px] text-muted-foreground">{filtered.length} assets</div>
+        <div className="flex items-center overflow-hidden rounded border border-window-border">
+          {(["hd", "sd"] as const).map((q) => {
+            const active = quality === q;
+            return (
+              <button
+                key={q}
+                onClick={() => setQuality(q)}
+                className={`px-2 py-1 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                  active ? "bg-accent text-accent-foreground" : "bg-window text-muted-foreground hover:bg-muted"
+                }`}
+                title={q === "hd" ? "HD: live 3D thumbnails" : "Lite: icons, 3D on hover"}
+              >
+                {q === "hd" ? "HD" : "Lite"}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Retro group selector — pixel segmented control */}
