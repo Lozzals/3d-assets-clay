@@ -135,7 +135,7 @@ export const AssetLibrary = () => {
 
   const filtered = useMemo(() => {
     return ASSETS.filter((a) => {
-      if (groupOf(a.c) === "Characters") return false;
+      if (groupOf(a.c) === "Characters" || groupOf(a.c) === "Animations") return false;
       const matchGroup = groupOf(a.c) === group;
       const matchCat = cat === "All" || a.c === cat;
       const q = query.trim().toLowerCase();
