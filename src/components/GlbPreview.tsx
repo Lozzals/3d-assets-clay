@@ -18,6 +18,16 @@ const thumbCache = new Map<string, Promise<string>>();
 
 const MAX_CONCURRENT = 6;
 
+// Per-file framing tweaks. Lower = tighter zoom (camera closer).
+// Use when a model's bounding box includes wide-spread parts (wings, arms)
+// that make the visible body look small in the thumbnail.
+const FRAMING_OVERRIDES: Record<string, number> = {
+  "purplepablito+wings.glb": 0.95,
+  "elephire.glb": 0.95,
+  "musicalcritter.glb": 0.95,
+};
+const framingFor = (file: string) => FRAMING_OVERRIDES[file.toLowerCase()] ?? 1.35;
+
 // ---- persistent thumbnail cache (IndexedDB) ----
 const IDB_NAME = "glb-thumbs";
 const IDB_STORE = "thumbs";
@@ -132,7 +142,7 @@ const renderThumb = async (file: string, q: "hd" | "sd"): Promise<string> => {
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1000);
   const fov = (camera.fov * Math.PI) / 180;
   const maxFitDim = Math.max(size.x, size.y, size.z);
-  const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * 1.35;
+  const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * framingFor(file);
   camera.position.copy(new THREE.Vector3(1, 0.7, 1.4).normalize().multiplyScalar(distance));
   camera.near = distance / 100;
   camera.far = distance * 100;
@@ -152,7 +162,7 @@ const getThumb = (file: string, q: "hd" | "sd"): Promise<string> => {
   let p = thumbCache.get(cacheKey);
   if (p) return p;
   p = (async () => {
-    const key = `v4-${q}:${file}`;
+    const key = `v5-${q}:${file}`;
     const cached = await idbGet(key);
     if (cached && cached.length > 2000) return cached;
     // Serialize renders — one shared WebGL renderer can't be used in parallel
@@ -280,7 +290,7 @@ const LiveView = ({ file }: { file: string }) => {
       scene.add(pivot);
       const fov = (camera.fov * Math.PI) / 180;
       const maxFitDim = Math.max(size.x, size.y, size.z);
-      const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * 1.35;
+      const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * framingFor(file);
       camera.position.copy(new THREE.Vector3(1, 0.7, 1.4).normalize().multiplyScalar(distance));
       camera.near = distance / 100;
       camera.far = distance * 100;
