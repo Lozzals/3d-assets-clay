@@ -142,10 +142,7 @@ export const ASSETS: Asset[] = [
   { n: "Puffer Fish", f: "PufferFish_low.glb", t: "glb", c: "Creatures" },
   { n: "Bird", f: "Bird_low.glb", t: "glb", c: "Creatures" },
   { n: "Dog", f: "Dog_low.glb", t: "glb", c: "Creatures" },
-  { n: "Rock Creature (3 anims)", f: "RockCreature_low.glb", t: "glb", c: "Creatures" },
-  { n: "Amythest Creature", f: "AmythestCreature_low.glb", t: "glb", c: "Creatures" },
   { n: "Monsters Pack", f: "Monsters_low.glb", t: "glb", c: "Creatures" },
-  { n: "Small Creature", f: "smallcreature.glb", t: "glb", c: "Creatures" },
   // STATUES
   { n: "Fountain 1 Pose", f: "Fountain1_Pose_low.glb", t: "glb", c: "Statues" },
   { n: "Fountain 2 Eyeball", f: "Fountain2_Eyeballs_Low.glb", t: "glb", c: "Statues" },
@@ -444,4 +441,8 @@ export const ASSETS: Asset[] = [
   { n: "Musical Critter", f: "musicalcritter.glb", t: "glb", c: "Creatures" },
   { n: "Parcel Bird", f: "parcelbird.glb", t: "glb", c: "Creatures" },
   { n: "Small Critter", f: "smallcritter.glb", t: "glb", c: "Creatures" },
+  { n: "Small Creature", f: "smallcreature.glb", t: "glb", c: "Creatures" },
+{ n: "Frog", f: "frog.glb", t: "glb", c: "Creatures" },
+{ n: "Amethyst Creature", f: "amithystcreature.glb", t: "glb", c: "Creatures" },
+{ n: "Rock Monster", f: "rockmonster.glb", t: "glb", c: "Creatures" },
 ];
