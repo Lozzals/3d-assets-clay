@@ -145,7 +145,6 @@ export const ASSETS: Asset[] = [
   { n: "Rock Creature (3 anims)", f: "RockCreature_low.glb", t: "glb", c: "Creatures" },
   { n: "Amythest Creature", f: "AmythestCreature_low.glb", t: "glb", c: "Creatures" },
   { n: "Monsters Pack", f: "Monsters_low.glb", t: "glb", c: "Creatures" },
-  { n: "Crocodile", f: "croc.glb", t: "glb", c: "Creatures" },
   { n: "Small Creature", f: "smallcreature.glb", t: "glb", c: "Creatures" },
   // STATUES
   { n: "Fountain 1 Pose", f: "Fountain1_Pose_low.glb", t: "glb", c: "Statues" },
