@@ -152,7 +152,7 @@ const getThumb = (file: string, q: "hd" | "sd"): Promise<string> => {
   let p = thumbCache.get(cacheKey);
   if (p) return p;
   p = (async () => {
-    const key = `v3-${q}:${file}`;
+    const key = `v4-${q}:${file}`;
     const cached = await idbGet(key);
     if (cached && cached.length > 2000) return cached;
     // Serialize renders — one shared WebGL renderer can't be used in parallel
