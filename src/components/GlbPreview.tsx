@@ -142,7 +142,7 @@ const renderThumb = async (file: string, q: "hd" | "sd"): Promise<string> => {
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1000);
   const fov = (camera.fov * Math.PI) / 180;
   const maxFitDim = Math.max(size.x, size.y, size.z);
-  const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * 1.35;
+  const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * framingFor(file);
   camera.position.copy(new THREE.Vector3(1, 0.7, 1.4).normalize().multiplyScalar(distance));
   camera.near = distance / 100;
   camera.far = distance * 100;
@@ -290,7 +290,7 @@ const LiveView = ({ file }: { file: string }) => {
       scene.add(pivot);
       const fov = (camera.fov * Math.PI) / 180;
       const maxFitDim = Math.max(size.x, size.y, size.z);
-      const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * 1.35;
+      const distance = (maxFitDim / (2 * Math.tan(fov / 2))) * framingFor(file);
       camera.position.copy(new THREE.Vector3(1, 0.7, 1.4).normalize().multiplyScalar(distance));
       camera.near = distance / 100;
       camera.far = distance * 100;
