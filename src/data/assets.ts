@@ -443,7 +443,6 @@ export const ASSETS: Asset[] = [
   { n: "Tree House", f: "TreeHouse.glb", t: "glb", c: "Misc" },
   { n: "Elephire", f: "elephire.glb", t: "glb", c: "Creatures" },
   { n: "Musical Critter", f: "musicalcritter.glb", t: "glb", c: "Creatures" },
-  { n: "Bird", f: "birdne.glb", t: "glb", c: "Creatures" },
   { n: "Parcel Bird", f: "parcelbird.glb", t: "glb", c: "Creatures" },
   { n: "Small Critter", f: "smallcritter.glb", t: "glb", c: "Creatures" },
 ];
