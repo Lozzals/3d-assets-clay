@@ -18,6 +18,16 @@ const thumbCache = new Map<string, Promise<string>>();
 
 const MAX_CONCURRENT = 6;
 
+// Per-file framing tweaks. Lower = tighter zoom (camera closer).
+// Use when a model's bounding box includes wide-spread parts (wings, arms)
+// that make the visible body look small in the thumbnail.
+const FRAMING_OVERRIDES: Record<string, number> = {
+  "purplepablito+wings.glb": 0.95,
+  "elephire.glb": 0.95,
+  "musicalcritter.glb": 0.95,
+};
+const framingFor = (file: string) => FRAMING_OVERRIDES[file.toLowerCase()] ?? 1.35;
+
 // ---- persistent thumbnail cache (IndexedDB) ----
 const IDB_NAME = "glb-thumbs";
 const IDB_STORE = "thumbs";
