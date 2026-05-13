@@ -419,7 +419,6 @@ export const ASSETS: Asset[] = [
   { n: "Planter Straight Edge Large", f: "Planter_StraightEdge_large_low.glb", t: "glb", c: "Pots" },
   { n: "Writing Table", f: "WritingTable_Drawer_low.glb", t: "glb", c: "Tables" },
   { n: "Bust", f: "Bust-Hyg.glb", t: "glb", c: "Statues" },
-  { n: "Clay Untamed", f: "ClayUntamed_low.glb", t: "glb", c: "Creatures" },
   { n: "Monster 1", f: "Monster1_low.glb", t: "glb", c: "Creatures" },
   { n: "Purple Pablito Wings", f: "PurplePablito+Wings.glb", t: "glb", c: "Creatures" },
   { n: "Rakudio Plaster High", f: "Rakudio_Plaster_Material__High.glb", t: "glb", c: "Interiors" },
